@@ -22,11 +22,11 @@
 
 ### 免安装网页版（推荐）
 
-前往 [Release](https://github.com/flowey307/ego-gift-tool/releases) 下载 `dist-single.7z`，解压后双击 `index.html` 即可在浏览器中打开使用，无需安装任何环境。
+前往 [Release](https://github.com/flowey307/ego-gift-tool/releases) 下载 `E.G.O.v1.0.0.html.rar`，解压后双击 `E.G.O gift tool v1.0.0.html` 即可在浏览器中打开使用，无需安装任何环境。
 
 ### 桌面应用（Windows）
 
-前往 [Release](https://github.com/flowey307/ego-gift-tool/releases) 下载 `E.G.O饰品图鉴 Setup.exe`，运行安装后即可从开始菜单/桌面快捷方式启动。与网页版功能一致，无需手动打开浏览器。
+前往 [Release](https://github.com/flowey307/ego-gift-tool/releases) 下载 `E.G.O.Setup.1.0.0.exe`，运行安装后即可从开始菜单/桌面快捷方式启动。与网页版功能一致，无需手动打开浏览器。
 
 ### 本地开发
 
