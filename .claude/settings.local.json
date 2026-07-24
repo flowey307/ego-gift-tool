@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx eslint *)",
+      "Bash(node -e \"import\\('vite-plugin-singlefile'\\).then\\(m => console.log\\(Object.keys\\(m\\)\\)\\)\")",
+      "Bash(node build/single.js)",
+      "Bash(NODE_OPTIONS='--use-system-ca' npx electron-builder)",
+      "Bash(python -c \"import plyer; print\\('plyer available'\\)\")",
+      "Bash(python -c \"from win10toast import ToastNotifier; print\\('win10toast available'\\)\")",
+      "Bash(grep -o '.{0,40}mode.{0,40}' \"C:/Users/WIN11/ego-gift-tool/dist-single/index.html\")",
+      "Bash(python -c \"import comtypes; print\\('comtypes available'\\)\")",
+      "Bash(python -c \"import win32com.client; print\\('pywin32 available'\\)\")",
+      "Bash",
+      "Write",
+      "Edit",
+      "WebSearch",
+      "WebFetch(domain:docs.anthropic.com)"
+    ]
+  }
+}

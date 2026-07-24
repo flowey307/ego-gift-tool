@@ -1,0 +1,68 @@
+{
+  "name": "ego-gift-tool",
+  "version": "1.0.0",
+  "description": "Limbus Company Ego Gift Management Tool",
+  "author": "flowey307",
+  "private": true,
+  "main": "electron-main.cjs",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:single": "node build/single.js",
+    "preview": "vite preview",
+    "lint": "run-s \"lint:*\"",
+    "lint:oxlint": "oxlint . --fix",
+    "lint:eslint": "eslint . --fix --cache",
+    "format": "prettier --write --experimental-cli src/",
+    "electron:dev": "vite --host & timeout /t 3 >nul && electron .",
+    "electron:prod": "npm run build && electron . --prod",
+    "electron:build": "npm run build && electron-builder"
+  },
+  "build": {
+    "appId": "com.yourname.egogifttool",
+    "productName": "E.G.O饰品图鉴",
+    "icon": "public/icon.png",
+    "files": [
+      "dist/**/*",
+      "electron-main.cjs"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "asar": false,
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "dependencies": {
+    "pinia": "^3.0.4",
+    "vue": "^3.5.38",
+    "vue-router": "^5.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@vitejs/plugin-vue": "^6.0.7",
+    "electron": "^43.1.1",
+    "electron-builder": "^26.15.3",
+    "eslint": "^10.5.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-oxlint": "~1.69.0",
+    "eslint-plugin-vue": "~10.9.2",
+    "globals": "^17.6.0",
+    "npm-run-all2": "^9.0.2",
+    "oxlint": "~1.69.0",
+    "prettier": "3.8.4",
+    "vite": "^8.0.16",
+    "vite-plugin-singlefile": "^2.3.3",
+    "vite-plugin-vue-devtools": "^8.1.2",
+    "vue-eslint-parser": "^10.4.1"
+  },
+  "engines": {
+    "node": "^22.18.0 || >=24.12.0"
+  }
+}

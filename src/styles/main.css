@@ -1,0 +1,133 @@
+/* 字体加载 */
+@font-face {
+  font-family: LimbusFont;
+  src: url('/fonts/ChineseFont.ttf') format('truetype');
+}
+
+/* 全局重置 */
+body {
+  font-family: LimbusFont, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #1a1a2e;
+  color: #e0e0e0;
+  font-size: 16px;
+}
+
+/* 应用容器 */
+.app {
+  min-height: 100vh;
+}
+
+/* 导航栏 */
+.nav-bar {
+  display: flex;
+  gap: 12px;
+  padding: 10px 20px;
+  background: #16213e;
+  border-bottom: 1px solid #333;
+  position: sticky;
+  top: 0;
+  z-index: 500;
+  align-items: center;
+  -webkit-app-region: drag;
+}
+
+.nav-link,
+.nav-btn,
+.mode-toggle {
+  -webkit-app-region: no-drag;
+}
+
+.nav-link {
+  color: #e0e0e0;
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 15px;
+  transition: background 0.2s;
+}
+
+.nav-link:hover {
+  background: #2a2a4a;
+}
+
+.nav-link.router-link-active {
+  background: #3a3a6a;
+  color: #fff;
+}
+
+.nav-btn {
+  padding: 5px 12px;
+  border: 1px solid #555;
+  border-radius: 14px;
+  background: #2a2a4a;
+  color: #ccc;
+  font-size: 13px;
+  font-family: LimbusFont, sans-serif;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.nav-btn:hover {
+  background: #3a3a5a;
+}
+
+.nav-btn--active {
+  background: #5a5aaa;
+  color: #fff;
+  border-color: #5a5aaa;
+}
+
+.nav-btn--close {
+  color: #e74c3c;
+  border-color: #733;
+  margin-left: auto;
+}
+
+.nav-btn--close:hover {
+  background: #4a2a2a;
+}
+
+.mode-toggle {
+  padding: 5px 12px;
+  border: 1px solid #555;
+  border-radius: 14px;
+  background: #2a2a4a;
+  color: #ccc;
+  font-size: 13px;
+  font-family: LimbusFont, sans-serif;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.mode-toggle:hover {
+  background: #3a3a5a;
+}
+
+/* 主内容 */
+.main-content {
+  padding: 24px;
+}
+
+/* 状态图标（全局） */
+.status-icon {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  margin-right: 2px;
+}
+
+.status-name-translated {
+  color: #d4a843;
+  text-decoration: underline;
+  margin-right: 2px;
+}
+
+/* 错误提示 */
+.error-banner {
+  background: #f44;
+  color: #fff;
+  padding: 12px 24px;
+  text-align: center;
+}
