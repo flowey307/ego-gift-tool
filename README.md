@@ -2,6 +2,9 @@
 
 > Limbus Company 饰品（Ego Gift）综合管理工具 — 图鉴浏览、卡包管理、楼层规划、合成配方查询
 
+由[@切杂鱼罢了](https://space.bilibili.com/408271440)所作ego饰品图鉴工具重做而成
+[原视频地址](https://www.bilibili.com/video/BV12U5b6AELY)
+
 ## 功能
 
 | 页面 | 说明 |
