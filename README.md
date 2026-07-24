@@ -26,7 +26,7 @@
 
 ### 桌面应用（Windows）
 
-前往 [Release](https://github.com/flowey307/ego-gift-tool/releases) 下载 `E.G.O饰品图鉴 Setup *.exe`，运行安装后即可从开始菜单/桌面快捷方式启动。与网页版功能一致，无需手动打开浏览器。
+前往 [Release](https://github.com/flowey307/ego-gift-tool/releases) 下载 `E.G.O饰品图鉴 Setup.exe`，运行安装后即可从开始菜单/桌面快捷方式启动。与网页版功能一致，无需手动打开浏览器。
 
 ### 本地开发
 
@@ -78,7 +78,7 @@ src/
 │   ├── userData.js          # 用户偏好（选中、标签、稀有度）
 │   └── mode.js              # 管理员/游客模式
 ├── composables/             # 跨组件逻辑复用
-│   ├── useGiftHelpers.js    # 图标 URL / 名称 / 类别图标
+│   ├── useGiftHelpers.js    # 图标 URL / 名称 / 类别图标 / 状态描述
 │   ├── useRecipePanel.js    # 拖拽配方面板 + 悬浮计时
 │   └── usePackList.js       # 查找饰品所属卡包
 ├── views/                   # 页面组件
