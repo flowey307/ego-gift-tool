@@ -117,11 +117,7 @@ import { useUserDataStore } from '@/stores/userData'
 import { useModeStore } from '@/stores/mode'
 import { useCardPackStore } from '@/stores/cardPack'
 import { useRecipesStore } from '@/stores/recipes'
-import {
-  ALL_CATEGORIES,
-  CATEGORIES,
-  RARITY_ORDER,
-} from '@/constants'
+import { ALL_CATEGORIES, CATEGORIES, RARITY_ORDER } from '@/constants'
 import { useRecipePanel } from '@/composables/useRecipePanel'
 import { useGiftHelpers } from '@/composables/useGiftHelpers'
 import { usePackImages } from '@/composables/useGiftHelpers'
@@ -147,6 +143,7 @@ const {
   closePanel,
   setHoverGift,
   cleanup,
+  startDrag,
 } = recipePanel
 
 const { getIconUrl, getGiftName } = useGiftHelpers(giftStore)
@@ -312,7 +309,9 @@ onUnmounted(() => {
   cursor: pointer;
   font-size: 15px;
   font-family: LimbusFont, sans-serif;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
 .filter-btn:hover {

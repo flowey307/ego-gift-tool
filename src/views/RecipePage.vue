@@ -104,6 +104,7 @@
               size="small"
               @click="openDetail(giftHelpers.getGift(mid))"
               @contextmenu.prevent="openContextMenu($event, mid)"
+              @mouseenter="setHoverGift(giftHelpers.getGift(mid))"
             />
             <span class="recipe-gift-name">{{ giftHelpers.getGiftName(mid) }}</span>
             <span v-if="i < r.materialIds.length - 1" class="recipe-plus">+</span>
@@ -115,6 +116,7 @@
             :gift="giftHelpers.getGift(r.resultId)"
             size="small"
             @click="openDetail(giftHelpers.getGift(r.resultId))"
+            @mouseenter="setHoverGift(giftHelpers.getGift(r.resultId))"
           />
           <span class="recipe-result-name">{{ giftHelpers.getGiftName(r.resultId) }}</span>
         </div>
@@ -139,6 +141,20 @@
 
     <!-- 详情弹窗 -->
     <GiftDetailModal :gift="detailGift" @close="detailGift = null" />
+
+    <RecipePanel
+      :recipes="recipes"
+      :pack-list="packList"
+      :pack-images="packImages"
+      :hover-gift="hoverGift"
+      :get-icon="getIconUrl"
+      :get-gift-name="getGiftName"
+      :panel-style="panelStyle"
+      :on-drag-start="startDrag"
+      @enter="onPanelEnter"
+      @leave="onPanelLeave"
+      @close="closePanel"
+    />
   </div>
 </template>
 
@@ -146,20 +162,34 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useModeStore } from '@/stores/mode'
 import { useGiftsStore } from '@/stores/gifts'
+import { useCardPackStore } from '@/stores/cardPack'
 import { useRecipesStore } from '@/stores/recipes'
 import { useUserDataStore } from '@/stores/userData'
+import { useRecipePanel } from '@/composables/useRecipePanel'
 import { useGiftHelpers } from '@/composables/useGiftHelpers'
+import { usePackImages } from '@/composables/useGiftHelpers'
+import { usePackList } from '@/composables/usePackList'
+import RecipePanel from '@/components/RecipePanel.vue'
 import GiftCard from '@/components/GiftCard.vue'
 import GiftDetailModal from '@/components/GiftDetailModal.vue'
 
 const modeStore = useModeStore()
 const giftStore = useGiftsStore()
+const cardPackStore = useCardPackStore()
 const recipeStore = useRecipesStore()
 const userStore = useUserDataStore()
 
 const giftHelpers = useGiftHelpers(giftStore)
 
+const recipePanel = useRecipePanel()
+const { hoverGift, panelStyle, setHoverGift, scheduleClosePanel, startDrag, onPanelEnter, onPanelLeave, closePanel } =
+  recipePanel
+
+const { packImages, loadPackImages } = usePackImages()
+const { getPackList } = usePackList(cardPackStore)
+
 const recipes = computed(() => recipeStore.recipes)
+const packList = computed(() => getPackList(hoverGift.value?.id))
 const allGifts = computed(() => giftStore.gifts)
 
 // 表单状态
@@ -334,6 +364,7 @@ function handleClickOutside(event) {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+  loadPackImages(cardPackStore.cardPacks)
 })
 
 onUnmounted(() => {
@@ -667,80 +698,5 @@ onUnmounted(() => {
 
 .context-menu-item:hover {
   background: #3a3a5a;
-}
-
-.recipe-hover-panel {
-  position: fixed;
-  right: 16px;
-  top: 60px;
-  max-width: 90vw;
-  max-height: calc(100vh - 80px);
-  overflow-y: auto;
-  background: #1e1e3f;
-  border: 1px solid #333;
-  border-radius: 10px;
-  padding: 12px;
-  z-index: 9999;
-  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.4);
-}
-
-.recipe-hover-panel__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.recipe-hover-panel__title {
-  margin: 0;
-  font-size: 14px;
-  color: #e0e0e0;
-  font-family: LimbusFont, sans-serif;
-}
-
-.recipe-hover-panel__close {
-  background: none;
-  border: none;
-  color: #aaa;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-.recipe-hover-panel__close:hover {
-  color: #fff;
-}
-
-.recipe-hover-panel__packs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.recipe-hover-panel__pack-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.recipe-hover-panel__pack-img {
-  width: auto;
-  height: 250px;
-  object-fit: cover;
-  border-radius: 4px;
-}
-
-.recipe-hover-panel__pack-placeholder {
-  width: 120px;
-  height: 250px;
-  background: #333;
-  border-radius: 4px;
-}
-
-.recipe-hover-panel__pack-name {
-  font-size: 12px;
-  color: #ccc;
-  font-family: LimbusFont, sans-serif;
-  text-align: center;
 }
 </style>

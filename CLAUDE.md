@@ -1,115 +1,112 @@
-# CLAUDE.md
+# # EGO 饰品图鉴工具
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+> Limbus Company 饰品（Ego Gift）综合管理工具 — 图鉴浏览、卡包管理、楼层规划、合成配方查询
 
-## Project Overview
+由[@切杂鱼罢了](https://space.bilibili.com/408271440)所作ego饰品图鉴工具重做而成[原视频地址](https://www.bilibili.com/video/BV12U5b6AELY)
 
-ego-gift-tool is a Vue 3 + Vite single-page application for managing "Ego Gifts" (饰品) from the game Limbus Company. It provides gift compendium browsing, card pack management, floor planning, and recipe/synthesis tracking — all persisted in localStorage.
+## 功能
 
-## Commands
+| 页面       | 说明                                |
+| -------- | --------------------------------- |
+| **饰品图鉴** | 按类别/稀有度浏览 450+ 饰品，支持搜索、筛选、上下文菜单管理 |
+| **卡包管理** | 增删卡包、编辑封面、分配楼层、关联饰品               |
+| **卡包饰品** | 按卡包查看/添加/移除饰品，支持标签（如"复刻"）标记       |
+| **楼层规划** | 已选饰品按楼层分组 + 楼层分布矩阵可视化             |
+| **合成方式** | 饰品合成配方（材料 → 结果）的增删改查              |
+
+**核心特性：**
+
+- 悬浮饰品图标 → 右侧显示合成配方 + 所属卡包（可拖拽定位）
+- 饰品描述中状态效果标签自动渲染为图标 + 中文翻译，悬浮查看详情
+- 全部用户数据（标签、稀有度、自定义饰品等）持久化至 localStorage
+
+## 获取使用
+
+### 免安装网页版（推荐）
+
+前往 [Release](https://github.com/flowey307/ego-gift-tool/releases) 下载 `E.G.O.v1.0.0.html.rar`，解压后双击 `E.G.O gift tool v1.0.0.html` 即可在浏览器中打开使用，无需安装任何环境。
+
+### 桌面应用（Windows）
+
+前往 [Release](https://github.com/flowey307/ego-gift-tool/releases) 下载 `E.G.O.Setup.1.0.0.exe`，运行安装后即可从开始菜单/桌面快捷方式启动。与网页版功能一致，无需手动打开浏览器。
+
+### 本地开发
+
+需要 Node.js `^22.18.0` 或 `>=24.12.0`。
 
 ```sh
-npm install                                 # Install dependencies
-npm run dev                                 # Start Vite dev server
-npm run build                               # Build for production
-npm run preview                             # Preview production build
-npm run lint                                # Run ESLint + oxlint with auto-fix
-npm run format                              # Format src/ with Prettier
-npm run electron:dev                        # Start Vite dev server + Electron desktop app
-npm run electron:prod                       # Build + launch Electron with production assets
-npm run electron:build                      # Build + package as Windows installer (NSIS)
+npm install              # 安装依赖
+
+npm run dev              # 启动 Web 开发服务器（localhost:5173）
+npm run build            # 生产构建
+
+npm run electron:dev     # 启动桌面应用（Vite + Electron）
+npm run electron:build   # 打包 Windows NSIS 安装包
 ```
 
-Electron entry point: [electron-main.cjs](electron-main.cjs) — spawns a local HTTP server on port `9876` (serving `dist/` static files), loads the page via `BrowserWindow`. Uses `asar: false` for Windows NSIS target.
+## 代码质量
 
-Node version requirement: `^22.18.0 || >=24.12.0`
+```sh
+npm run lint             # ESLint + oxlint 检查并自动修复
+npm run format           # Prettier 格式化 src/ 目录
+```
 
-No test framework is configured for this project.
+## 技术栈
 
-## Architecture
+```
+Vue 3.5     ──┐
+              ├──  Composition API + <script setup>
+Vite 8.0    ─┤
+Pinia 3.0   ─┼── 状态管理（5 个 Store，全部基于 localStorage 持久化）
+Vue Router 5   ─┤
+              │
+ESLint 10 + oxlint + Prettier ── 代码检查与格式化
+Electron 43  ────────────────── 桌面端封装
+```
 
-### Routing & Layout
+## 项目结构
 
-- [App.vue](src/App.vue) — Root component with sticky `<nav>` bar (5 links + admin toggle) and `<router-view>`. Loads all Pinia stores on mount.
-- [router/index.js](src/router/index.js) — 5 routes: `/`, `/cardpack`, `/packgifts`, `/planning`, `/recipe`. Uses `createWebHistory` with scroll restoration.
-- [main.js](src/main.js) — Bootstrap: creates Vue app, registers Pinia + Router, mounts `#app`.
+```
+src/
+├── data/                    # 静态数据（不可变）
+│   ├── gifts.js             # 450+ 饰品定义
+│   ├── cardPacks.js         # 72 预设卡包
+│   ├── cardPackGifts.js     # 卡包→饰品映射
+│   └── recipes.js           # 59 预设配方
+├── stores/                  # Pinia Stores
+│   ├── gifts.js             # 饰品 CRUD、类别/搜索过滤
+│   ├── cardPack.js          # 卡包 CRUD、楼层分配
+│   ├── recipes.js           # 配方 CRUD
+│   ├── userData.js          # 用户偏好（选中、标签、稀有度）
+│   └── mode.js              # 管理员/游客模式
+├── composables/             # 跨组件逻辑复用
+│   ├── useGiftHelpers.js    # 图标 URL / 名称 / 类别图标 / 状态描述
+│   ├── useRecipePanel.js    # 拖拽配方面板 + 悬浮计时
+│   └── usePackList.js       # 查找饰品所属卡包
+├── views/                   # 页面组件
+├── components/              # 公共组件
+├── utils/                   # 工具函数
+└── constants/               # 共享常量
+```
 
-### Pages (views)
+## 数据存储
 
-| Route | File | Purpose |
-|-------|------|---------|
-| `/` | [CompendiumPage.vue](src/views/CompendiumPage.vue) | Gift catalog with category filter, search, rarity grouping, admin CRUD, context menu, draggable recipe hover panel |
-| `/cardpack` | [CardPackPage.vue](src/views/CardPackPage.vue) | Card pack gallery with cover images, floor selection (1-15, parallel/extreme toggles), gift association |
-| `/packgifts` | [PackGiftsPage.vue](src/views/PackGiftsPage.vue) | Per-card-pack gift management: search+add gifts, labels ("复刻"), recipe hover panel |
-| `/planning` | [PlanningPage.vue](src/views/PlanningPage.vue) | Floor planning: selected gifts grouped by floor tier, draggable recipe/kit panel, FloorGrid component |
-| `/recipe` | [RecipePage.vue](src/views/RecipePage.vue) | Recipe editor: form with gift search dropdowns for materials → result, sortable recipe list |
+所有用户生成数据存储在浏览器 **localStorage** 中：
 
-### Components
+| 键前缀                      | 用途                   |
+| ------------------------ | -------------------- |
+| `egogift_giftOverrides`  | 覆盖官方饰品数据（名称/类别/描述）   |
+| `egogift_customGifts`    | 用户自定义添加的饰品           |
+| `egogift_deletedGiftIds` | 已删除饰品 ID             |
+| `egogift_recipes`        | 合成配方                 |
+| `egogift_cardPacks`      | 自定义卡包                |
+| `egogift_packGifts`      | 卡包→饰品映射              |
+| `egogift_*`              | 用户偏好（选中、标签、稀有度、类别覆盖） |
+| `egogift_icon_${id}`     | 自定义饰品图标（Base64）      |
+| `cardpack_img_${id}`     | 自定义卡包封面（Base64）      |
 
-- [GiftCard.vue](src/components/GiftCard.vue) — Reusable gift icon tile (shows rarity badge, category icon, icon image). Emits click/contextmenu/hover.
-- [GiftDetailModal.vue](src/components/GiftDetailModal.vue) — Version toggle + rarity selection + description with status icon rendering + recipe list.
-- [ContextMenu.vue](src/components/ContextMenu.vue) — Context menu with add, label, card pack assignment, category change, edit, delete.
-- [FloorGrid.vue](src/components/FloorGrid.vue) — Matrix table: rows = floor tiers (1, 2, 3, 4, 5, parallel 6-10, extreme 11-15), columns = card packs, with rowspan merging.
-- [CardPackCover.vue](src/components/CardPackCover.vue) — Card pack cover thumbnail with editable name on double-click.
-- [RecipePanel.vue](src/components/RecipePanel.vue) — Draggable hover panel showing synthesis recipes and card pack membership.
+> ⚠️ 清除浏览器数据会导致所有用户偏好丢失。
 
-### Composables
+## 许可
 
-- [useRecipePanel.js](src/composables/useRecipePanel.js) — Draggable recipe hover panel logic with hover timer auto-close (5s delay). Shared across CompendiumPage, PlanningPage, and PackGiftsPage.
-- [useGiftHelpers.js](src/composables/useGiftHelpers.js) — Gift icon URL resolution (`localStorage` → `/EgoGiftIcon/${id}.png` fallback), gift name/lookup helpers, card pack image loading, and category icon resolution.
-- [usePackImages()](src/composables/useGiftHelpers.js) — Extracted from useGiftHelpers; manages pack cover image loading from `localStorage` or `public/card_pack/`.
-- [useCategoryIcon()](src/composables/useGiftHelpers.js) — Resolves category icon URLs based on `CATEGORY_ICON_MAP` constant.
-
-### State (Pinia stores)
-
-All stores load from static data + localStorage overrides on mount (triggered in App.vue).
-
-| Store | File | Key State |
-|-------|------|-----------|
-| `useGiftsStore` | [stores/gifts.js](src/stores/gifts.js) | `gifts`, `filteredGifts` (computed), `activeCategory`, `searchQuery`. Merges raw gift data with localStorage overrides/custom gifts/deleted IDs. Admin CRUD via `addGift`, `updateGift`, `removeGift`. |
-| `useCardPackStore` | [stores/cardPack.js](src/stores/cardPack.js) | `cardPacks`, `packGifts` (packId → giftId[] map), `floorDistribution` (computed). Auto-merges saved floors from presets if empty. CRUD for packs and gift assignments. |
-| `useRecipesStore` | [stores/recipes.js](src/stores/recipes.js) | `recipes` array. CRUD + `moveRecipe`/`insertRecipeAt`/`updateRecipe`. Prefilled from data/recipes.js if localStorage is empty. |
-| `useUserDataStore` | [stores/userData.js](src/stores/userData.js) | `selectedGiftIds`, `giftLabels`, `giftRarities`, `giftCategoryOverrides`, `giftCardPackMap`. User preferences persisted in localStorage. Supports multi-pack membership. |
-| `useModeStore` | [stores/mode.js](src/stores/mode.js) | `isAdmin` (default `true`), `toggle()`. Controls admin vs visitor visibility for CRUD features. |
-
-### Data layer
-
-- [data/gifts.js](src/data/gifts.js) — ~300+ Ego gift definitions (id, name, category, descriptions for base/+ /++, defaultRarity). ~295KB.
-- [data/cardPacks.js](src/data/cardPacks.js) — ~70 predefined card packs with id, name, imageKey, floors arrays.
-- [data/cardPackGifts.js](src/data/cardPackGifts.js) — Default gift assignment per card pack (keyed by pack `imageKey`).
-- [data/recipes.js](src/data/recipes.js) — ~59 recipe entries (materialIds → resultId).
-- [constants/index.js](src/constants/index.js) — Shared constants: `CATEGORIES`, `RARITY_ORDER`, `FLOOR_ROWS`, `PACK_COLORS`, `SELECTED_GIFT_GROUPS`, storage key templates (`ICON_BASE_URL`, `CARD_PACK_BASE_URL`), and floor range configs.
-- [utils/statusHelpers.js](src/utils/statusHelpers.js) — `statusIcons` map, `statusTranslations` (Chinese), `statusDescriptions`, and `translateStatus()` function that converts `[StatusKey]` markers in descriptions to `<img>` + translated text.
-
-### Storage layer
-
-- [utils/storage.js](src/utils/storage.js) — `loadFromLocal(key, default)` / `saveToLocal(key, value)` wrapping localStorage with `egogift_` prefix and JSON parse/error handling.
-
-localStorage key patterns:
-| Prefix | Used By | Example |
-|--------|---------|---------|
-| `egogift_` | Generic store data | `egogift_giftOverrides`, `egogift_recipes`, `egogift_packGifts` |
-| `egogift_icon_${id}` | Custom gift icon (base64) | `egogift_icon_9191` |
-| `cardpack_img_${id}` | Custom card pack cover (base64) | `cardpack_img_The Outcast` |
-
-### Static assets
-
-- `public/EgoGiftIcon/` — Gift icon PNGs (named by ID, e.g. `9191.png`)
-- `public/Buf/` — Status effect icons (e.g. `Combustion.png`, `Vibration.png`)
-- `public/card_pack/` — Card pack cover images (e.g. `Miracle in District 20.png`)
-- `public/fonts/ChineseFont.ttf` — Custom Chinese font (loaded via `@font-face` as `LimbusFont`)
-
-### Build configuration
-
-- [vite.config.js](vite.config.js) — `base: './'` (relative paths for Electron static serving), `@` alias for `src/`, Vue DevTools disabled in production mode.
-
-## Key patterns to follow
-
-- All data persistence goes through Pinia stores using `loadFromLocal`/`saveToLocal` from `utils/storage.js` with the `egogift_` prefix.
-- Icon URLs follow a two-tier resolution: check `localStorage.getItem(ICON_STORAGE_KEY(id))` for custom base64, fall back to `${ICON_BASE_URL}/${id}.png`.
-- Admin mode toggle (`modeStore.isAdmin`) controls visibility of CRUD operations, rarity selection, and context menu edit options.
-- Recipe hover panel is shared across multiple pages via the `useRecipePanel()` composable: appears on gift hover, draggable, auto-closes after 5 seconds.
-- Description rendering uses `translateStatus()` to convert `[StatusKey]` markers into translated status icons + text with Chinese labels.
-- Store initialization merges static data with localStorage overrides on mount in [App.vue](src/App.vue). Gift data also tracks `isCustom` flag for new gifts vs imported overrides.
-- Cards packs use `imageKey` as the primary identifier (often different from `id`). Card pack gift assignments are keyed by `imageKey` in the default data.
-- The Electron build serves built assets via a custom HTTP server on port 9876, not Vite's dev server. `electron-main.cjs` handles static file serving with URL decoding for filenames containing spaces.
+个人项目，仅供 Limbus Company 玩家社区交流使用。

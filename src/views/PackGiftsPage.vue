@@ -10,7 +10,6 @@
         class="pack-item"
         :class="{ 'pack-item--active': selectedPackId === pack.id }"
         @click="selectPack(pack.id)"
-        @contextmenu.prevent="openPackMenu($event, pack)"
       >
         <img v-if="packImages[pack.id]" :src="packImages[pack.id]" class="pack-item__cover" />
         <div v-else class="pack-item__cover-placeholder"></div>
@@ -70,17 +69,6 @@
     </div>
 
     <div
-      v-if="packMenu.visible"
-      class="context-menu"
-      :style="{ left: packMenu.x + 'px', top: packMenu.y + 'px' }"
-    >
-      <div class="context-menu__item" @click="addGiftToPackFromMenu">添加饰品</div>
-      <div class="context-menu__item context-menu__item--danger" @click="removePackFromMenu">
-        移出卡包
-      </div>
-    </div>
-
-    <div
       v-if="giftMenu.visible"
       class="context-menu"
       :style="{ left: giftMenu.x + 'px', top: giftMenu.y + 'px' }"
@@ -113,8 +101,8 @@
       :hover-gift="hoverGift"
       :get-icon="getIconUrl"
       :get-gift-name="getGiftName"
-      :panel-style="recipePanel.panelStyle"
-      :on-drag-start="recipePanel.startDrag"
+      :panel-style="panelStyle"
+      :on-drag-start="startDrag"
       @enter="recipePanel.onPanelEnter"
       @leave="recipePanel.onPanelLeave"
       @close="recipePanel.closePanel"
@@ -142,7 +130,7 @@ const userStore = useUserDataStore()
 const recipeStore = useRecipesStore()
 
 const recipePanel = useRecipePanel()
-const { hoverGift, setHoverGift } = recipePanel
+const { hoverGift, panelStyle, setHoverGift, startDrag } = recipePanel
 
 const { getIconUrl, getGiftName } = useGiftHelpers(giftStore)
 const { packImages, loadPackImages } = usePackImages()
@@ -153,7 +141,6 @@ const selectedPackId = ref(null)
 const searchGift = ref('')
 const showDropdown = ref(false)
 const detailGift = ref(null)
-const packMenu = ref({ visible: false, x: 0, y: 0, packId: null })
 const giftMenu = ref({ visible: false, x: 0, y: 0, giftId: null })
 const showLabelInput = ref(false)
 const labelValue = ref('')
@@ -221,30 +208,6 @@ function removeGiftFromPack(giftId) {
     cardPackStore.removeGiftFromPack(selectedPackId.value, giftId)
     giftMenu.value.visible = false
   }
-}
-
-function openPackMenu(event, pack) {
-  packMenu.value = { visible: true, x: event.clientX, y: event.clientY, packId: pack.id }
-}
-
-function addGiftToPackFromMenu() {
-  const packId = packMenu.value.packId
-  if (packId) {
-    const currentIds = cardPackStore.getGiftsForPack(packId)
-    const available = giftStore.gifts.filter((g) => !currentIds.includes(g.id))
-    if (available.length) {
-      cardPackStore.addGiftToPack(packId, available[0].id)
-    }
-  }
-  packMenu.value.visible = false
-}
-
-function removePackFromMenu() {
-  const packId = packMenu.value.packId
-  if (packId) {
-    cardPackStore.setPackGifts(packId, [])
-  }
-  packMenu.value.visible = false
 }
 
 function openGiftMenu(event, gift) {
@@ -330,7 +293,9 @@ onMounted(() => {
   border-radius: 8px;
   cursor: pointer;
   border: 2px solid transparent;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
   width: 80px;
 }
 

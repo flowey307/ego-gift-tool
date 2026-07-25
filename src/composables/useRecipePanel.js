@@ -46,6 +46,7 @@ export function useRecipePanel() {
 
   function startDrag(e) {
     if (e.button !== 0) return
+    e.preventDefault()
     const panel = document.querySelector('.recipe-panel')
     if (!panel) return
     const rect = panel.getBoundingClientRect()
@@ -54,19 +55,20 @@ export function useRecipePanel() {
       panelPosition.value = { x: rect.left, y: rect.top }
     }
     isDragging.value = true
-    document.addEventListener('mousemove', onDrag)
-    document.addEventListener('mouseup', stopDrag)
+    window.addEventListener('mousemove', onDrag)
+    window.addEventListener('mouseup', stopDrag)
   }
 
   function onDrag(e) {
     if (!isDragging.value) return
+    e.preventDefault()
     panelPosition.value = { x: e.clientX - dragOffset.value.x, y: e.clientY - dragOffset.value.y }
   }
 
   function stopDrag() {
     isDragging.value = false
-    document.removeEventListener('mousemove', onDrag)
-    document.removeEventListener('mouseup', stopDrag)
+    window.removeEventListener('mousemove', onDrag)
+    window.removeEventListener('mouseup', stopDrag)
   }
 
   function setHoverGift(g) {
@@ -80,7 +82,7 @@ export function useRecipePanel() {
     panelStyle: computed(() => {
       const pos = panelPosition.value
       if (pos.x === null || pos.y === null) {
-        return { right: '0px', top: '60px', left: 'auto' }
+        return { right: '20px', top: '60px', left: 'auto' }
       }
       return { right: 'auto', top: pos.y + 'px', left: pos.x + 'px' }
     }),
@@ -93,8 +95,8 @@ export function useRecipePanel() {
     stopDrag,
     setHoverGift,
     cleanup: () => {
-      document.removeEventListener('mousemove', onDrag)
-      document.removeEventListener('mouseup', stopDrag)
+      window.removeEventListener('mousemove', onDrag)
+      window.removeEventListener('mouseup', stopDrag)
       if (hoverTimer.value) clearTimeout(hoverTimer.value)
     },
   }

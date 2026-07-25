@@ -34,8 +34,8 @@
       :hover-gift="hoverGift"
       :get-icon="getIconUrl"
       :get-gift-name="getGiftName"
-      :panel-style="recipePanel.panelStyle"
-      :on-drag-start="recipePanel.startDrag"
+      :panel-style="panelStyle"
+      :on-drag-start="startDrag"
       @enter="recipePanel.onPanelEnter"
       @leave="recipePanel.onPanelLeave"
       @close="recipePanel.closePanel"
@@ -90,7 +90,7 @@ const cardPackStore = useCardPackStore()
 const recipeStore = useRecipesStore()
 
 const recipePanel = useRecipePanel()
-const { hoverGift, scheduleClosePanel, setHoverGift, cleanup } = recipePanel
+const { hoverGift, panelStyle, scheduleClosePanel, setHoverGift, startDrag, cleanup } = recipePanel
 
 const { getIconUrl, getGiftName } = useGiftHelpers(giftStore)
 const { packImages, loadPackImages } = usePackImages()
