@@ -2,6 +2,9 @@
 
 > Limbus Company 饰品（Ego Gift）综合管理工具 — 图鉴浏览、卡包管理、楼层规划、合成配方查询
 
+由[@切杂鱼罢了](https://space.bilibili.com/408271440)所作ego饰品图鉴工具重做而成
+[原视频地址](https://www.bilibili.com/video/BV12U5b6AELY)
+
 ## 功能
 
 | 页面 | 说明 |
@@ -22,11 +25,11 @@
 
 ### 免安装网页版（推荐）
 
-前往 [Release](https://github.com/flowey307/ego-gift-tool/releases) 下载 `dist-single.7z`，解压后双击 `index.html` 即可在浏览器中打开使用，无需安装任何环境。
+前往 [Release](https://github.com/flowey307/ego-gift-tool/releases) 下载 `E.G.O.v1.0.0.html.rar`，解压后双击 `E.G.O gift tool v1.0.0.html` 即可在浏览器中打开使用，无需安装任何环境。
 
 ### 桌面应用（Windows）
 
-前往 [Release](https://github.com/flowey307/ego-gift-tool/releases) 下载 `E.G.O饰品图鉴 Setup *.exe`，运行安装后即可从开始菜单/桌面快捷方式启动。与网页版功能一致，无需手动打开浏览器。
+前往 [Release](https://github.com/flowey307/ego-gift-tool/releases) 下载 `E.G.O.Setup.1.0.0.exe`，运行安装后即可从开始菜单/桌面快捷方式启动。与网页版功能一致，无需手动打开浏览器。
 
 ### 本地开发
 
@@ -78,7 +81,7 @@ src/
 │   ├── userData.js          # 用户偏好（选中、标签、稀有度）
 │   └── mode.js              # 管理员/游客模式
 ├── composables/             # 跨组件逻辑复用
-│   ├── useGiftHelpers.js    # 图标 URL / 名称 / 类别图标
+│   ├── useGiftHelpers.js    # 图标 URL / 名称 / 类别图标 / 状态描述
 │   ├── useRecipePanel.js    # 拖拽配方面板 + 悬浮计时
 │   └── usePackList.js       # 查找饰品所属卡包
 ├── views/                   # 页面组件
