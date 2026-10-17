@@ -117,7 +117,9 @@ const version = ref('base')
 // 切换饰品时重置版本为 -
 watch(
   () => props.gift?.id,
-  () => { version.value = 'base' },
+  () => {
+    version.value = 'base'
+  },
 )
 
 // 状态悬浮提示
@@ -180,7 +182,9 @@ const effectiveCategory = computed(() => {
 })
 
 // 类别图标
-const categoryOverride = computed(() => userStore.giftCategoryOverrides[props.gift.id] || props.gift.category)
+const categoryOverride = computed(
+  () => userStore.giftCategoryOverrides[props.gift.id] || props.gift.category,
+)
 const { categoryIcon } = useCategoryIcon(categoryOverride)
 
 // 图标 URL（优先使用自定义 Base64）

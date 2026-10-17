@@ -31,7 +31,9 @@ const rarity = computed(() => {
   return props.gift.defaultRarity || null
 })
 
-const categoryOverride = computed(() => userStore.giftCategoryOverrides[props.gift.id] || props.gift.category)
+const categoryOverride = computed(
+  () => userStore.giftCategoryOverrides[props.gift.id] || props.gift.category,
+)
 const { categoryIcon } = useCategoryIcon(categoryOverride)
 
 const iconUrl = computed(() => {

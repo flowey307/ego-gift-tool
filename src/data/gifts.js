@@ -1516,11 +1516,11 @@ const Op = {
       defaultRarity: 'III',
       descriptions: {
         base: `士气低落或陷入恐慌的敌方单位技能的最终威力-1(未带有理智值的敌方单位改为带有的[Sinking]强度不低于25级时触发)
-  - 增加[Sinking]强度，施加[Sinking]层数或施加特殊[Sinking]的技能对该敌方单位造成伤害时，对其施加2层[DefenseDown](每回合最多2次)`,
+  - 增加[Sinking]强度，施加[Sinking]层数或施加特殊[Sinking]的技能对该敌方单位造成伤害时，下回合对其施加2层[DefenseDown](每回合最多2次)`,
         plus: `士气低落或陷入恐慌的敌方单位技能的最终威力-2(未带有理智值的敌方单位改为带有的[Sinking]强度不低于15级时触发)
-  - 增加[Sinking]强度，施加[Sinking]层数或施加特殊[Sinking]的技能对该敌方单位造成伤害时，对其施加3层[DefenseDown](每回合最多2次)`,
+  - 增加[Sinking]强度，施加[Sinking]层数或施加特殊[Sinking]的技能对该敌方单位造成伤害时，下回合对其施加3层[DefenseDown](每回合最多2次)`,
         double_plus: `士气低落或陷入恐慌的敌方单位技能的最终威力-3(未带有理智值的敌方单位改为带有的[Sinking]强度不低于10级时触发)
-  - 增加[Sinking]强度，施加[Sinking]层数或施加特殊[Sinking]的技能对该敌方单位造成伤害时，对其施加3层[DefenseDown](每回合最多3次)`,
+  - 增加[Sinking]强度，施加[Sinking]层数或施加特殊[Sinking]的技能对该敌方单位造成伤害时，下回合对其施加3层[DefenseDown](每回合最多3次)`,
       },
     },
     {
@@ -5604,7 +5604,7 @@ const Op = {
     {
       id: 9262,
       name: '万物的骨架',
-      category: '泛用',
+      category: '流血',
       defaultRarity: 'II',
       descriptions: {
         base: `属于环指的人格攻击后，对目标施加1层随机物理属性的抗性弱化(每回合最多2次)
@@ -5680,15 +5680,15 @@ const Op = {
       descriptions: {
         base: `最大[Combustion]强度+11
   战斗中首次增加的[Combustion]强度变为3倍(每场战斗最多1次)
-  敌方单位受到[Combustion]伤害时，对其造成相当于其[Combustion]强度的暴怒伤害
+  敌方单位因触发[Combustion]而受到[Combustion]伤害时，对其造成相当于其[Combustion]强度的暴怒伤害
   增加[Combustion]强度，施加[Combustion]层数或施加特殊[Combustion]的技能造成的伤害+20%`,
         plus: `最大[Combustion]强度+21
   战斗中首次增加的[Combustion]强度变为3倍(每场战斗最多1次)
-  敌方单位受到[Combustion]伤害时，对其造成相当于其[Combustion]强度的暴怒伤害
+  敌方单位因触发[Combustion]而受到[Combustion]伤害时，对其造成相当于其[Combustion]强度的暴怒伤害
   增加[Combustion]强度，施加[Combustion]层数或施加特殊[Combustion]的技能造成的伤害+25%`,
         double_plus: `最大[Combustion]强度+21
   战斗中首次增加的[Combustion]强度变为3倍(每场战斗最多1次)
-  敌方单位受到[Combustion]伤害时，对其造成相当于其[Combustion]强度x1.5的暴怒伤害
+  敌方单位因触发[Combustion]而受到[Combustion]伤害时，对其造成相当于其[Combustion]强度x1.5的暴怒伤害
   增加[Combustion]强度，施加[Combustion]层数或施加特殊[Combustion]的技能造成的伤害+30%`,
       },
     },
@@ -6826,6 +6826,112 @@ const Op = {
       descriptions: {
         base: `[第1顺位人格专属]
 关卡开始时，使自身获得1层紧急用[KAmpouleA1C94TH]`,
+        plus: '',
+        double_plus: '',
+      },
+    },
+    {
+      id: 9864,
+      name: '毛毯',
+      category: '充能',
+      defaultRarity: 'II',
+      descriptions: {
+        base: `本回合装备了守备技能的人格受到来自敌方单位攻击的伤害-20%
+- 战斗结束时，若自身为[ChargeIdentity]，则下回合使自身获得2层[AttackUp]
+- 战斗结束时，若自身属于西西弗，则下回合使自身获得1层[ResultEnhancement]`,
+        plus: '',
+        double_plus: '',
+      },
+    },
+    {
+      id: 9865,
+      name: '饰花剪刀',
+      category: '充能',
+      defaultRarity: 'II',
+      descriptions: {
+        base: `[第1顺位友方单位专属]
+属于西西弗的人格或[ChargeIdentity]基础技能的最后一枚硬币命中时，对主要目标造成相当于该硬币最终伤害量5%的斩击伤害(每个技能最多1次)`,
+        plus: `[第1顺位友方单位专属]
+属于西西弗的人格或[ChargeIdentity]基础技能的最后一枚硬币命中时，对主要目标造成相当于该硬币最终伤害量10%的斩击伤害(每个技能最多1次)`,
+        double_plus: `[第1顺位友方单位专属]
+属于西西弗的人格或[ChargeIdentity]基础技能的最后一枚硬币命中时，对主要目标造成相当于该硬币最终伤害量15%的斩击伤害(每个技能最多1次)`,
+      },
+    },
+    {
+      id: 9866,
+      name: '裁缝之王的直针',
+      category: '充能',
+      defaultRarity: 'III',
+      descriptions: {
+        base: `回合开始时，若没有敌方单位带有[MarkoftheKingofNeedleworks]，则随机对1名敌方单位施加[MarkoftheKingofNeedleworks](若是集中遭遇战，则以部位判定)`,
+        plus: '',
+        double_plus: '',
+      },
+    },
+    {
+      id: 9867,
+      name: '软骨',
+      category: '充能',
+      defaultRarity: 'III',
+      descriptions: {
+        base: `消耗[Charge]层数或特殊[Charge]的技能造成的伤害+(自身的[Charge]强度×2)%(最多+10%)
+回合结束时，若本回合自身消耗了[Charge]层数或特殊[Charge]，则下回合使自身获得1层[Agility]
+若目标的速度值低于自身，则使自身的拼点威力+1
+- 若自身属于西西弗，则改为最终威力+1`,
+        plus: '',
+        double_plus: '',
+      },
+    },
+    {
+      id: 9868,
+      name: '黑派品牌世家休闲裤',
+      category: '震颤',
+      defaultRarity: 'III',
+      descriptions: {
+        base: `[Charge]强度不低于2级的友方单位触发[VibrationExplosion]时，触发以下效果
+- 对目标造成(自身的[Charge]强度与层数之积)点嫉妒伤害(每个技能最多2次，每次最多100点)
+- 若通过以上效果造成了2次嫉妒伤害，则下回合对目标施加3层[Binding]
+友方单位通过技能触发[VibrationExplosion]时，下回合使其获得(其[Charge]强度/3)层[AttackUp](每回合最多5层，向下取整)`,
+        plus: '',
+        double_plus: '',
+      },
+    },
+    {
+      id: 9869,
+      name: '黑派玛丽珍鞋',
+      category: '充能',
+      defaultRarity: 'III',
+      descriptions: {
+        base: `战斗开始时带有的护盾最高的人格攻击命中时，对目标造成相当于该人格现存护盾50%的怠惰伤害(每个技能最多2次，每次最多100点，向下取整)
+- 若带有的护盾相同的人格不低于2名，则按编队顺序适用
+若该人格为[ChargeIdentity]，则改为造成相当于其护盾100%的怠惰伤害(每个技能最多3次，每次最多100点，向下取整)`,
+        plus: '',
+        double_plus: '',
+      },
+    },
+    {
+      id: 9870,
+      name: '过时的红派服饰',
+      category: '泛用',
+      defaultRarity: 'III',
+      descriptions: {
+        base: `友方单位通过基础攻击技能的技能或硬币效果恢复体力时，使恢复的体力+50%(每回合最多3次，向下取整)
+[高级定制::红派精品店 以实玛利专属]
+若高级定制::红派 赤红之神 辛克莱与自身同时在场，则回合开始时使自身获得1层[更衣室]并进入[更衣室]状态(每场战斗最多1次)
+- 若被动“进入更衣室…”的“本场战斗中，自身受到使自身体力降至0点的伤害时，无视该伤害，并立即使自身获得2层[更衣室]并进入[更衣室]状态(每场战斗最多1次)”效果触发，则专属效果不会触发
+- 若专属效果触发，则被动的“进入更衣室…”的“本场战斗中，自身受到使自身体力降至0点的伤害时，无视该伤害，并立即使自身获得2层[更衣室]并进入[更衣室]状态(每场战斗最多1次)”效果不会触发`,
+        plus: '',
+        double_plus: '',
+      },
+    },
+    {
+      id: 9871,
+      name: '碳酸饮料',
+      category: '泛用',
+      defaultRarity: 'II',
+      descriptions: {
+        base: `本回合不低于1次试图通过自身的技能或硬币效果恢复体力的罪人在下回合使其技能造成的伤害+10%并获得(该回合试图恢复量/10)层[AttackUp](最多6层，向下取整)
+若场上有与自身属于同一阵营的人格，则使自身获得层数相当于除自身以外与自身属于同一阵营的人格通过以上效果获得的[AttackUp]层数一半的[AttackUp](最少1层，每回合最多3层，向下取整)`,
         plus: '',
         double_plus: '',
       },

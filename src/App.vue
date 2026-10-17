@@ -30,11 +30,7 @@ const modeStore = useModeStore()
 
 onMounted(async () => {
   // 加载所有数据
-  await Promise.all([
-    giftsStore.loadGifts(),
-    cardPackStore.loadPacks(),
-    recipeStore.loadRecipes(),
-  ])
+  await Promise.all([giftsStore.loadGifts(), cardPackStore.loadPacks(), recipeStore.loadRecipes()])
 })
 </script>
 

@@ -156,9 +156,7 @@ function getColor(index) {
 const sortedPacks = computed(() => {
   // 过滤已隐藏的卡包
   const hidden = new Set(Array.isArray(props.hiddenPacks) ? props.hiddenPacks : [])
-  let packs = props.cardPacks.filter(
-    (p) => p.floors && p.floors.length > 0 && !hidden.has(p.id),
-  )
+  let packs = props.cardPacks.filter((p) => p.floors && p.floors.length > 0 && !hidden.has(p.id))
   if (props.filterPackId) {
     packs = packs.filter((p) => p.id === props.filterPackId)
   }
@@ -337,7 +335,9 @@ const reprintRecipe = computed(() => {
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.15s, background 0.15s;
+  transition:
+    opacity 0.15s,
+    background 0.15s;
   padding: 0;
 }
 
@@ -404,7 +404,9 @@ const reprintRecipe = computed(() => {
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.15s, background 0.15s;
+  transition:
+    opacity 0.15s,
+    background 0.15s;
   padding: 0;
 }
 

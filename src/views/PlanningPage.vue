@@ -44,11 +44,7 @@
     <div class="planning-page__section">
       <div class="section-header">
         <h3 class="section-title">楼层分布</h3>
-        <button
-          v-if="hiddenPackIds.length"
-          class="clear-all-btn"
-          @click="restoreAllHiddenPacks"
-        >
+        <button v-if="hiddenPackIds.length" class="clear-all-btn" @click="restoreAllHiddenPacks">
           恢复所有隐藏卡包
         </button>
       </div>
@@ -103,7 +99,11 @@ const hiddenPackIds = ref([])
 function loadHiddenPacks() {
   const stored = localStorage.getItem('egogift_hiddenPacks')
   if (stored) {
-    try { hiddenPackIds.value = JSON.parse(stored) } catch { hiddenPackIds.value = [] }
+    try {
+      hiddenPackIds.value = JSON.parse(stored)
+    } catch {
+      hiddenPackIds.value = []
+    }
   }
 }
 
@@ -137,8 +137,10 @@ const groupedSelected = computed(() => {
   for (const g of selectedGifts.value) {
     const avgFloor = getAverageFloor(g.id)
     if (avgFloor >= FLOOR_RANGES.low[0] && avgFloor <= FLOOR_RANGES.low[1]) groups[1].gifts.push(g)
-    else if (avgFloor > FLOOR_RANGES.low[1] && avgFloor <= FLOOR_RANGES.mid[1]) groups[2].gifts.push(g)
-    else if (avgFloor > FLOOR_RANGES.mid[1] && avgFloor <= FLOOR_RANGES.high[1]) groups[3].gifts.push(g)
+    else if (avgFloor > FLOOR_RANGES.low[1] && avgFloor <= FLOOR_RANGES.mid[1])
+      groups[2].gifts.push(g)
+    else if (avgFloor > FLOOR_RANGES.mid[1] && avgFloor <= FLOOR_RANGES.high[1])
+      groups[3].gifts.push(g)
     else groups[0].gifts.push(g)
   }
   return groups.filter((g) => g.gifts.length)

@@ -182,8 +182,16 @@ const userStore = useUserDataStore()
 const giftHelpers = useGiftHelpers(giftStore)
 
 const recipePanel = useRecipePanel()
-const { hoverGift, panelStyle, setHoverGift, scheduleClosePanel, startDrag, onPanelEnter, onPanelLeave, closePanel } =
-  recipePanel
+const {
+  hoverGift,
+  panelStyle,
+  setHoverGift,
+  scheduleClosePanel,
+  startDrag,
+  onPanelEnter,
+  onPanelLeave,
+  closePanel,
+} = recipePanel
 
 const { packImages, loadPackImages } = usePackImages()
 const { getPackList } = usePackList(cardPackStore)

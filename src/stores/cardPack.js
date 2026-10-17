@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import rawPacks from '@/data/cardPacks.js'
-import defaultPackGifts from '@/data/cardPackGifts.js' // 新增
 import { loadFromLocal, saveToLocal } from '@/utils/storage'
 
 export const useCardPackStore = defineStore('cardPack', () => {
@@ -11,11 +10,23 @@ export const useCardPackStore = defineStore('cardPack', () => {
   const packGifts = ref({})
 
   // --- 加载卡包 ---
+  // 合并策略为「只增不覆盖」：
+  //   - 本地已有的卡包以用户版本为准（改名、改楼层都不会被预设冲掉）
+  //   - 预设中本地没有的卡包会追加进来，新用户/老用户都能拿到最新预设
+  //   - 预设里删掉的卡包不会从本地移除，避免误删用户数据
+  //   - 新追加的卡包同时会补上预设的 giftIds 种子
   function loadPacks() {
+    const toPack = (p) => ({
+      id: p.id,
+      name: p.name,
+      imageKey: p.imageKey || null,
+      floors: p.floors || [],
+    })
+
     const saved = loadFromLocal('cardPacks', [])
-    // 如果 saved 有数据，但某些卡包 floors 为空，从预设补全
+
     if (saved.length > 0) {
-      // 建立预设数据的映射（按 id 或 imageKey）
+      // 已有本地数据：补全 floors，并把预设中缺失的卡包追加进来
       const presetMap = {}
       rawPacks.forEach((p) => {
         presetMap[p.id] = p.floors || []
@@ -24,7 +35,6 @@ export const useCardPackStore = defineStore('cardPack', () => {
           presetMap[p.imageKey] = p.floors || []
         }
       })
-      // 合并：如果 saved 中的 floors 为空，且预设中有值，则使用预设值
       const merged = saved.map((p) => {
         const presetFloors = presetMap[p.id] || presetMap[p.imageKey]
         if (presetFloors && presetFloors.length > 0 && (!p.floors || p.floors.length === 0)) {
@@ -32,26 +42,35 @@ export const useCardPackStore = defineStore('cardPack', () => {
         }
         return p
       })
+
+      const removedIds = loadFromLocal('removedPackIds', [])
+      const localIds = new Set(merged.map((p) => p.id))
+      const added = rawPacks
+        .filter((p) => !localIds.has(p.id) && !removedIds.includes(p.id))
+        .map(toPack)
+      if (added.length > 0) {
+        merged.push(...added)
+      }
+
       cardPacks.value = merged
-      saveToLocal('cardPacks', cardPacks.value)
     } else {
-      // 无数据，使用预设
-      cardPacks.value = rawPacks.map((p) => ({
-        id: p.id,
-        name: p.name,
-        imageKey: p.imageKey || null,
-        floors: p.floors || [],
-      }))
-      saveToLocal('cardPacks', cardPacks.value)
+      // 无本地数据，全量使用预设
+      cardPacks.value = rawPacks.map(toPack)
     }
+    saveToLocal('cardPacks', cardPacks.value)
 
     const savedGifts = loadFromLocal('packGifts', null)
-    if (savedGifts !== null) {
-      packGifts.value = savedGifts
-    } else {
-      packGifts.value = { ...defaultPackGifts }
-      saveToLocal('packGifts', packGifts.value)
+    const gifts = savedGifts !== null ? savedGifts : {}
+
+    // 确保每个卡包都有映射条目；缺的新卡包用预设 giftIds 作种子
+    for (const pack of cardPacks.value) {
+      if (!gifts[pack.id]) {
+        const preset = rawPacks.find((p) => p.id === pack.id)
+        gifts[pack.id] = [...(preset?.giftIds || [])]
+      }
     }
+    packGifts.value = gifts
+    saveToLocal('packGifts', packGifts.value)
   }
 
   // --- 卡包 CRUD ---
@@ -83,9 +102,18 @@ export const useCardPackStore = defineStore('cardPack', () => {
   }
 
   function removeCardPack(id) {
+    const pack = cardPacks.value.find((p) => p.id === id)
     cardPacks.value = cardPacks.value.filter((p) => p.id !== id)
     if (selectedPackId.value === id) selectedPackId.value = null
     saveToLocal('cardPacks', cardPacks.value)
+    // 预设卡包被删除时记入墓碑，避免下次加载被「新增预设卡包」的逻辑加回来
+    if (pack && rawPacks.some((p) => p.id === id)) {
+      const removed = loadFromLocal('removedPackIds', [])
+      if (!removed.includes(id)) {
+        removed.push(id)
+        saveToLocal('removedPackIds', removed)
+      }
+    }
     // 删除对应的饰品映射
     delete packGifts.value[id]
     saveToLocal('packGifts', packGifts.value)
