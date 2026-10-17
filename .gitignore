@@ -38,3 +38,5 @@ __screenshots__/
 # Vite
 *.timestamp-*-*.mjs
 release/
+dist-single/
+dist-single-temp/
