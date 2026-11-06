@@ -8,19 +8,17 @@
   >
     <span v-if="rarity" class="gift-card__rarity">{{ rarity }}</span>
     <img
-      :src="iconUrl"
+      v-lazy-img="iconUrl"
       :alt="gift.name"
       class="gift-card__icon"
-      loading="lazy"
       decoding="async"
       @error="onError"
     />
     <img
       v-if="categoryIcon"
-      :src="categoryIcon"
+      v-lazy-img="categoryIcon"
       :alt="gift.category"
       class="gift-card__category"
-      loading="lazy"
       decoding="async"
     />
   </div>

@@ -13,9 +13,8 @@
       >
         <img
           v-if="packImages[pack.id]"
-          :src="packImages[pack.id]"
+          v-lazy-img="packImages[pack.id]"
           class="pack-item__cover"
-          loading="lazy"
           decoding="async"
         />
         <div v-else class="pack-item__cover-placeholder"></div>

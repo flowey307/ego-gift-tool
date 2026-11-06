@@ -3,10 +3,9 @@
     <div class="card-pack-cover__image">
       <img
         v-if="imageData"
-        :src="imageData"
+        v-lazy-img="imageData"
         :alt="name"
         class="card-pack-cover__img"
-        loading="lazy"
         decoding="async"
       />
       <div v-else class="card-pack-cover__placeholder">
