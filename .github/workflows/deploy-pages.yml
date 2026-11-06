@@ -38,7 +38,7 @@ jobs:
         run: node build/single.js --skip-dist
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: dist-single
 
@@ -51,4 +51,8 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
+        with:
+          # 产物约 111MB（2115 个 PNG + 23MB 字体），推送到 Pages CDN
+          # 超过默认的 10 分钟上限，放宽到 30 分钟
+          timeout: 1800000
