@@ -7,8 +7,22 @@
     @mouseenter="emit('hover', gift)"
   >
     <span v-if="rarity" class="gift-card__rarity">{{ rarity }}</span>
-    <img :src="iconUrl" :alt="gift.name" class="gift-card__icon" @error="onError" />
-    <img v-if="categoryIcon" :src="categoryIcon" :alt="gift.category" class="gift-card__category" />
+    <img
+      :src="iconUrl"
+      :alt="gift.name"
+      class="gift-card__icon"
+      loading="lazy"
+      decoding="async"
+      @error="onError"
+    />
+    <img
+      v-if="categoryIcon"
+      :src="categoryIcon"
+      :alt="gift.category"
+      class="gift-card__category"
+      loading="lazy"
+      decoding="async"
+    />
   </div>
 </template>
 

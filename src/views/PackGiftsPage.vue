@@ -11,7 +11,13 @@
         :class="{ 'pack-item--active': selectedPackId === pack.id }"
         @click="selectPack(pack.id)"
       >
-        <img v-if="packImages[pack.id]" :src="packImages[pack.id]" class="pack-item__cover" />
+        <img
+          v-if="packImages[pack.id]"
+          :src="packImages[pack.id]"
+          class="pack-item__cover"
+          loading="lazy"
+          decoding="async"
+        />
         <div v-else class="pack-item__cover-placeholder"></div>
         <span class="pack-item__name">{{ pack.name }}</span>
       </div>

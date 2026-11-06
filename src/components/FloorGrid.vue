@@ -8,7 +8,13 @@
         class="pack-overview__item"
         :style="{ borderColor: getColor(index) }"
       >
-        <img v-if="packImages[pack.id]" :src="packImages[pack.id]" class="pack-overview__img" />
+        <img
+          v-if="packImages[pack.id]"
+          :src="packImages[pack.id]"
+          class="pack-overview__img"
+          loading="lazy"
+          decoding="async"
+        />
         <div v-else class="pack-overview__placeholder"></div>
         <span class="pack-overview__name">{{ pack.name }}</span>
         <button

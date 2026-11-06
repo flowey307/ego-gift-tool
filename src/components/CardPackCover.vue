@@ -1,7 +1,14 @@
 <template>
   <div class="card-pack-cover" @click="emit('click', packId)">
     <div class="card-pack-cover__image">
-      <img v-if="imageData" :src="imageData" :alt="name" class="card-pack-cover__img" />
+      <img
+        v-if="imageData"
+        :src="imageData"
+        :alt="name"
+        class="card-pack-cover__img"
+        loading="lazy"
+        decoding="async"
+      />
       <div v-else class="card-pack-cover__placeholder">
         <span class="card-pack-cover__placeholder-text">无封面</span>
       </div>
