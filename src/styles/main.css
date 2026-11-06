@@ -1,9 +1,11 @@
 /* 字体加载 */
+/*   中文名 → woff2（体积小，优先）；文件名含空格，需用 url() 包裹 */
 @font-face {
-  font-family: LimbusFont;
-  src: url('/fonts/ChineseFont.ttf') format('truetype');
-  /* 字体文件约 23MB，不加 swap 会阻塞首屏渲染（load 事件要等字体下载完）。
-     swap 让页面先用系统字体渲染，字体到位后自动替换 */
+  font-family: 'LimbusFont';
+  src:
+    url('/fonts/ChineseFont-subset.woff2') format('woff2'),
+    url('/fonts/ChineseFont-subset.ttf') format('truetype');
+  /* 字体未就绪时先用系统字体渲染，避免阻塞首屏 */
   font-display: swap;
 }
 

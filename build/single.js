@@ -30,10 +30,12 @@ console.log('📄 Copied index.html to dist-single/')
 // 4. 复制静态资源到 dist-single/
 //    来源必须是 tempDir（Vite 构建时已把 public/ 拷入其中），不能用 dist/：
 //    dist/ 在全新环境（CI）里不存在，existsSync 会静默跳过，导致产物丢失全部图标与字体。
-const assetDirs = ['EgoGiftIcon', 'Buf', 'card_pack', 'fonts']
+const assetDirs = ['EgoGiftIcon', 'Buf', 'card_pack']
 const favicon = join(tempDir, 'favicon.ico')
 // 根级图标（public/icon.png），index.html 用作 favicon
 const rootIcons = ['icon.png']
+// 字体只拷子集版：完整 TTF 有 22.8MB，且不再被 CSS 引用，部署上去纯属浪费
+const fontFiles = ['ChineseFont-subset.woff2', 'ChineseFont-subset.ttf']
 let copiedCount = 0
 
 for (const dirName of assetDirs) {
@@ -59,6 +61,19 @@ for (const iconName of rootIcons) {
   if (existsSync(src)) {
     copyFileSync(src, join(distSingle, iconName))
     copiedCount += 1
+  }
+}
+
+// 字体子集
+const fontDest = join(distSingle, 'fonts')
+mkdirSync(fontDest, { recursive: true })
+for (const fontName of fontFiles) {
+  const src = join(tempDir, 'fonts', fontName)
+  if (existsSync(src)) {
+    copyFileSync(src, join(fontDest, fontName))
+    copiedCount += 1
+  } else {
+    console.warn(`⚠️  Missing font: ${fontName}`)
   }
 }
 
