@@ -58,4 +58,5 @@ export default [
   { id: '57', materialIds: [9778, 9779], resultId: 9780 },
   { id: '58', materialIds: [9762, 9763], resultId: 9764 },
   { id: '59', materialIds: [9706, 9707, 9431], resultId: 9249 },
+  { id: '60', materialIds: [9432, 9436], resultId: 9872 },
 ]

@@ -35,7 +35,8 @@ body {
 
 .nav-link,
 .nav-btn,
-.mode-toggle {
+.mode-toggle,
+.reset-btn {
   -webkit-app-region: no-drag;
 }
 
@@ -103,6 +104,31 @@ body {
 
 .mode-toggle:hover {
   background: #3a3a5a;
+}
+
+/* 恢复默认按钮（导航栏右上角） */
+.reset-btn {
+  margin-left: auto;
+  padding: 5px 12px;
+  border: 1px solid #7a4a4a;
+  border-radius: 14px;
+  background: #3a2530;
+  color: #e0a0a0;
+  font-size: 13px;
+  font-family: LimbusFont, sans-serif;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.reset-btn:hover:not(:disabled) {
+  background: #4d2f3a;
+  border-color: #a05a5a;
+  color: #f0b0b0;
+}
+
+.reset-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* 主内容 */

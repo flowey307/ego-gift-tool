@@ -13,28 +13,59 @@ export const useGiftsStore = defineStore('gifts', () => {
   const searchQuery = ref('')
 
   // --- 加载数据 ---
+  // 合并策略为「只增不覆盖」，与卡包 / 配方保持一致：
+  //   - 本地快照存在 → 以本地为准，预设中新增的饰品追加进来
+  //   - 预设中删掉的饰品 → 不会从本地移除，避免误删用户数据
+  //   - 用户改过的饰品 → 保留用户的版本，预设覆盖会被本地快照挡住
+  //   - 用户删掉的饰品 → 记入 deletedGiftIds 墓碑，重开不会复活
+  //
+  // 统一维护 `giftsSnapshot`：本地快照是数据的唯一基准（以用户为主），
+  // 预设只在加载时提供新增内容，不会覆盖用户改过的版本。
+  function persistSnapshot() {
+    saveToLocal('giftsSnapshot', gifts.value)
+  }
+
   async function loadGifts() {
     loadStatus.value = 'loading'
     try {
-      const overrides = loadFromLocal('giftOverrides', {})
+      const snapshot = loadFromLocal('giftsSnapshot', null)
       const custom = loadFromLocal('customGifts', [])
       const deleted = loadFromLocal('deletedGiftIds', [])
+      const overrides = loadFromLocal('giftOverrides', {})
+      const isFirstLoad = !snapshot || !Array.isArray(snapshot) || snapshot.length === 0
 
-      let base = rawGifts.map((g) => ({
-        ...g,
-        isCustom: false,
-      }))
+      if (isFirstLoad) {
+        // 首次加载（或已清空）：全量使用预设
+        gifts.value = rawGifts.map((g) => ({ ...g, isCustom: false }))
+      } else {
+        // 本地已有快照：以本地为基准，追加预设中新增的饰品
+        const localIds = new Set(snapshot.map((g) => g.id))
+        const added = rawGifts
+          .filter((g) => !localIds.has(g.id) && !deleted.includes(g.id))
+          .map((g) => ({ ...g, isCustom: false }))
+        gifts.value = added.length > 0 ? [...snapshot, ...added] : snapshot
+      }
 
-      // 应用覆盖（修改官方饰品名称、类别、描述）
-      base = base.map((g) => {
+      // 应用用户覆盖（giftOverrides 是用户编辑的最终意图，始终优先于预设与快照）
+      // 迁移场景：老用户只有 giftOverrides、没有快照时，靠这一步保住编辑
+      gifts.value = gifts.value.map((g) => {
         const ov = overrides[g.id]
-        return ov ? { ...g, ...ov } : g
+        return ov ? { ...g, ...ov, isCustom: g.isCustom } : g
       })
 
-      const all = [...base, ...custom]
-      const filtered = all.filter((g) => !deleted.includes(g.id))
+      // 自定义饰品并入（不在预设内，不会与预设冲突）
+      for (const c of custom) {
+        if (!gifts.value.some((g) => g.id === c.id)) {
+          gifts.value.push({ ...c, isCustom: true })
+        }
+      }
 
-      gifts.value = filtered
+      // 墓碑过滤：用户删掉的饰品不显示
+      gifts.value = gifts.value.filter((g) => !deleted.includes(g.id))
+
+      // 首次生成快照，后续都以本地为准
+      if (isFirstLoad) persistSnapshot()
+
       loadStatus.value = 'success'
     } catch (err) {
       loadError.value = err.message
@@ -85,6 +116,7 @@ export const useGiftsStore = defineStore('gifts', () => {
     }
 
     gifts.value.push(newGift)
+    persistSnapshot()
 
     const custom = loadFromLocal('customGifts', [])
     custom.push(newGift)
@@ -118,6 +150,7 @@ export const useGiftsStore = defineStore('gifts', () => {
       },
     }
     gifts.value[index] = updated
+    persistSnapshot()
 
     if (old.isCustom) {
       const custom = loadFromLocal('customGifts', [])
@@ -127,6 +160,8 @@ export const useGiftsStore = defineStore('gifts', () => {
         saveToLocal('customGifts', custom)
       }
     } else {
+      // 官方饰品：同时写 giftOverrides —— 它是用户编辑的最终意图，
+      // 加载时优先级最高，能挡住预设与快照的同名字段
       const overrides = loadFromLocal('giftOverrides', {})
       overrides[id] = {
         name: updated.name,
@@ -147,10 +182,18 @@ export const useGiftsStore = defineStore('gifts', () => {
 
   function removeGift(id) {
     gifts.value = gifts.value.filter((g) => g.id !== id)
+    persistSnapshot()
 
     const custom = loadFromLocal('customGifts', [])
     const filteredCustom = custom.filter((g) => g.id !== id)
     saveToLocal('customGifts', filteredCustom)
+
+    // 清除该饰品的覆盖记录，避免删除后又被 overrides 复活
+    const overrides = loadFromLocal('giftOverrides', {})
+    if (overrides[id]) {
+      delete overrides[id]
+      saveToLocal('giftOverrides', overrides)
+    }
 
     const deleted = loadFromLocal('deletedGiftIds', [])
     if (!deleted.includes(id)) {

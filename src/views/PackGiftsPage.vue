@@ -24,17 +24,18 @@
           <input
             v-model="searchGift"
             class="pack-detail__search"
-            placeholder="添加饰品..."
+            :disabled="!modeStore.isAdmin"
+            :placeholder="modeStore.isAdmin ? '添加饰品...' : '添加饰品（需管理模式）'"
             @focus="showDropdown = true"
           />
-          <div v-if="showDropdown && searchResults.length" class="pack-detail__dropdown">
+          <div v-if="modeStore.isAdmin && showDropdown && searchResults.length" class="pack-detail__dropdown">
             <div
               v-for="g in searchResults"
               :key="g.id"
               class="pack-detail__dropdown-item"
               @mousedown.prevent="addGiftToPack(g.id)"
             >
-              <img :src="getIcon(g.id)" class="pack-detail__dropdown-icon" />
+              <img :src="getIconUrl(g.id)" class="pack-detail__dropdown-icon" />
               <span>{{ g.name }}</span>
             </div>
           </div>
@@ -74,22 +75,24 @@
       :style="{ left: giftMenu.x + 'px', top: giftMenu.y + 'px' }"
     >
       <div class="context-menu__item" @click="addToSelected(giftMenu.giftId)">+ 添加</div>
-      <div class="context-menu__item" @click="toggleLabelInput">修改标签</div>
-      <div v-if="showLabelInput" class="context-menu__inline">
-        <input
-          v-model="labelValue"
-          class="context-menu__input"
-          placeholder="输入标签"
-          @keydown.enter="saveLabel"
-        />
-        <button class="context-menu__confirm" @click="saveLabel">确认</button>
-      </div>
-      <div
-        class="context-menu__item context-menu__item--danger"
-        @click="removeGiftFromPack(giftMenu.giftId)"
-      >
-        移出卡包
-      </div>
+      <template v-if="modeStore.isAdmin">
+        <div class="context-menu__item" @click="toggleLabelInput">修改标签</div>
+        <div v-if="showLabelInput" class="context-menu__inline">
+          <input
+            v-model="labelValue"
+            class="context-menu__input"
+            placeholder="输入标签"
+            @keydown.enter="saveLabel"
+          />
+          <button class="context-menu__confirm" @click="saveLabel">确认</button>
+        </div>
+        <div
+          class="context-menu__item context-menu__item--danger"
+          @click="removeGiftFromPack(giftMenu.giftId)"
+        >
+          移出卡包
+        </div>
+      </template>
     </div>
 
     <GiftDetailModal :gift="detailGift" @close="detailGift = null" />
@@ -116,6 +119,7 @@ import { useCardPackStore } from '@/stores/cardPack'
 import { useGiftsStore } from '@/stores/gifts'
 import { useUserDataStore } from '@/stores/userData'
 import { useRecipesStore } from '@/stores/recipes'
+import { useModeStore } from '@/stores/mode'
 import { useRecipePanel } from '@/composables/useRecipePanel'
 import { useGiftHelpers } from '@/composables/useGiftHelpers'
 import { usePackImages } from '@/composables/useGiftHelpers'
@@ -128,6 +132,7 @@ const cardPackStore = useCardPackStore()
 const giftStore = useGiftsStore()
 const userStore = useUserDataStore()
 const recipeStore = useRecipesStore()
+const modeStore = useModeStore()
 
 const recipePanel = useRecipePanel()
 const { hoverGift, panelStyle, setHoverGift, startDrag } = recipePanel
@@ -196,6 +201,8 @@ function selectPack(id) {
 }
 
 function addGiftToPack(giftId) {
+  // 仅管理模式可添加饰品
+  if (!modeStore.isAdmin) return
   if (selectedPackId.value) {
     cardPackStore.addGiftToPack(selectedPackId.value, giftId)
     searchGift.value = ''
@@ -204,6 +211,8 @@ function addGiftToPack(giftId) {
 }
 
 function removeGiftFromPack(giftId) {
+  // 仅管理模式可移出饰品
+  if (!modeStore.isAdmin) return
   if (selectedPackId.value) {
     cardPackStore.removeGiftFromPack(selectedPackId.value, giftId)
     giftMenu.value.visible = false
@@ -221,6 +230,12 @@ function toggleLabelInput() {
 }
 
 function saveLabel() {
+  // 仅管理模式可修改标签
+  if (!modeStore.isAdmin) {
+    showLabelInput.value = false
+    giftMenu.value.visible = false
+    return
+  }
   if (giftMenu.value.giftId) {
     userStore.setLabel(giftMenu.value.giftId, labelValue.value)
   }
@@ -371,6 +386,16 @@ onMounted(() => {
 
 .pack-detail__search:focus {
   border-color: #7a7aff;
+}
+
+.pack-detail__search:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #24243d;
+}
+
+.pack-detail__search:disabled:focus {
+  border-color: #444;
 }
 
 .pack-detail__search::placeholder {

@@ -76,7 +76,7 @@ npm run format           # Prettier 格式化 src/ 目录
 Vue 3.5     ──┐
               ├──  Composition API + <script setup>
 Vite 8.0    ─┤
-Pinia 3.0   ─┼── 状态管理（5 个 Store，除 mode.js 外全部基于 localStorage 持久化）
+Pinia 3.0   ─┼── 状态管理（6 个 Store，除 mode.js 外全部基于 localStorage 持久化）
 Vue Router 5   ─┤
               │
 ESLint 10 + oxlint + Prettier ── 代码检查与格式化
@@ -104,13 +104,14 @@ Electron 43  ────────────────── 桌面端封
     ├── data/               # 静态数据（不可变）
     │   ├── gifts.js        # 464 个饰品定义（对象导出：{ version, generated_at, gifts }）
     │   ├── cardPacks.js    # 76 个预设卡包（含 giftIds，卡包→饰品映射已并入）
-    │   └── recipes.js      # 59 条预设配方
+    │   └── recipes.js      # 60 条预设配方
     ├── stores/             # Pinia Stores
-    │   ├── gifts.js        # 饰品 CRUD、类别/搜索过滤
+    │   ├── gifts.js        # 饰品 CRUD、类别/搜索过滤、快照合并
     │   ├── cardPack.js     # 卡包 CRUD、楼层分配、floorDistribution
     │   ├── recipes.js      # 配方 CRUD
     │   ├── userData.js     # 用户偏好（选中、标签、稀有度、类别覆盖、卡包映射）
-    │   └── mode.js         # 管理员/游客模式（不持久化，刷新即重置）
+    │   ├── mode.js         # 管理员/游客模式（不持久化，刷新即重置）
+    │   └── reset.js        # 恢复默认（清 localStorage + 刷新页面）
     ├── views/              # 页面组件
     ├── components/         # 公共组件
     ├── composables/        # 跨组件逻辑复用
@@ -119,7 +120,7 @@ Electron 43  ────────────────── 桌面端封
     │   └── usePackList.js       # 查找饰品所属卡包
     ├── utils/
     │   ├── statusHelpers.js     # statusIcons / statusTranslations / statusDescriptions + translateStatus()
-    │   ├── storage.js           # loadFromLocal / saveToLocal（自动加 egogift_ 前缀）
+    │   ├── storage.js           # loadFromLocal / saveToLocal（自动加 egogift_ 前缀）+ clearAppStorage
     │   └── fileHelpers.js       # File → Base64 DataURL
     ├── constants/index.js  # 类别、类别→图标映射、稀有度序、楼层配置、卡包配色、路径模板
     └── styles/main.css
@@ -149,13 +150,16 @@ localStorage  用户数据 ──┼──> stores/* ──> views/* ──> com
 
 | 完整键名                        | 用途                                 |
 | ------------------------------- | ------------------------------------ |
+| `egogift_giftsSnapshot`         | 饰品全量快照（数据的唯一基准）       |
 | `egogift_giftOverrides`         | 覆盖官方饰品数据（名称/类别/描述）   |
 | `egogift_customGifts`           | 用户自定义添加的饰品                 |
 | `egogift_deletedGiftIds`        | 已删除饰品 ID                        |
 | `egogift_recipes`               | 合成配方                             |
+| `egogift_removedRecipeIds`      | 用户删除的预设配方（墓碑，防止复活） |
 | `egogift_cardPacks`             | 自定义卡包                           |
 | `egogift_packGifts`             | 卡包→饰品映射                        |
 | `egogift_removedPackIds`        | 用户删除的预设卡包（墓碑，防止复活） |
+| `egogift_removedPackGifts`      | 用户移除的预设卡包饰品（墓碑，防止复活） |
 | `egogift_selectedGiftIds`       | 已选饰品（楼层规划）                 |
 | `egogift_giftLabels`            | 饰品标签（如"复刻"）                 |
 | `egogift_giftRarities`          | 稀有度覆盖（I ~ EX）                 |
@@ -172,9 +176,27 @@ localStorage  用户数据 ──┼──> stores/* ──> views/* ──> com
 
 > ⚠️ 清除浏览器数据会导致所有用户偏好丢失。
 
-### 卡包预设的合并策略
+### 预设数据的合并策略
 
-`loadPacks()` 对「本地数据」与「`data/cardPacks.js` 预设」采用**只增不覆盖**的合并：
+**所有数据统一以用户为主**：本地数据是唯一基准，预设只在加载时补充新增内容，永不覆盖用户改过的版本。
+
+`loadGifts()` / `loadPacks()` / `loadRecipes()` 对「本地数据」与「`data/*.js` 预设」采用**只增不覆盖**的合并。
+
+**饰品（`loadGifts()`）**
+
+| 情况                         | 行为                                                   |
+| ---------------------------- | ------------------------------------------------------ |
+| 首次加载（无快照）           | 全量使用预设，并生成 `egogift_giftsSnapshot` 快照       |
+| 预设里有、本地没有的饰品     | **追加**到快照末尾                                     |
+| 本地已有的饰品               | 以用户版本为准（改名、改描述都不被冲掉）               |
+| 预设里删掉的饰品             | **不会**从快照移除                                     |
+| 用户删掉的饰品               | 记入 `egogift_deletedGiftIds` 墓碑，重开不会复活       |
+
+> 饰品的基准是 `egogift_giftsSnapshot` 全量快照（约 154 KB，占 localStorage 配额 3%）。
+> `egogift_giftOverrides` 是用户编辑的**最终意图**，加载时优先级最高，能挡住预设与快照的同名字段。
+> 老用户（只有 `giftOverrides` / `customGifts`、无快照）首次加载时会自动迁移进快照，编辑不会丢失。
+
+**卡包（`loadPacks()`）**
 
 | 情况                     | 行为                                             |
 | ------------------------ | ------------------------------------------------ |
@@ -184,10 +206,42 @@ localStorage  用户数据 ──┼──> stores/* ──> views/* ──> com
 | 预设里删掉的卡包         | **不会**从本地移除                               |
 | 用户删掉的预设卡包       | 记入 `egogift_removedPackIds` 墓碑，重开不会复活 |
 
-这样新加卡包/新配方能自动出现在老用户界面里，无需清 localStorage；用户的编辑也不会被版本更新覆盖。
+**卡包饰品映射（`packGifts`）**
+
+| 情况                         | 行为                                                    |
+| ---------------------------- | ------------------------------------------------------- |
+| 预设里有、本地没有的 giftId | **追加**进该卡包的映射（老用户也能拿到新增饰品）      |
+| 本地已有的 giftId           | 以用户版本为准（用户加的、删的都保留）                  |
+| 用户删掉的预设饰品           | 记入 `egogift_removedPackGifts` 墓碑，重开不会被追加   |
+| 用户手动加回同一饰品         | 清除对应墓碑，之后不再被当成「移除过」                 |
+| 预设里删掉的饰品             | **不会**从本地移除                                      |
+
+> 墓碑键格式为 `<packId>::<giftId>`，只记录预设中的饰品（非预设饰品删除后本就不会被重新注入，无需墓碑）。删除卡包时会一并清理该卡包的饰品墓碑。
+
+**配方（`loadRecipes()`）**
+
+| 情况                     | 行为                                            |
+| ------------------------ | ----------------------------------------------- |
+| 预设里有、本地没有的配方 | **追加**到列表末尾                             |
+| 本地已有的配方           | 以用户版本为准（编辑内容、调整顺序都不被冲掉）  |
+| 用户删掉的预设配方       | 记入 `egogift_removedRecipeIds` 墓碑，重开不会复活 |
+| 用户自建的配方           | id 为 UUID，永远不会被预设覆盖                 |
+
+这样新加卡包/新配方/新饰品能自动出现在老用户界面里，无需清 localStorage；用户的编辑也不会被版本更新覆盖。
+
+### 恢复默认
+
+导航栏右上角有「恢复默认」按钮（[App.vue](src/App.vue) → [stores/reset.js](src/stores/reset.js)）。点击后：
+
+1. `confirm()` 二次确认，列出将被清除的内容
+2. `utils/storage.js` 的 `clearAppStorage()` 清除所有 `egogift_` 前缀键 + `cardpack_img_*` 键
+3. `location.reload()` 刷新，各 store 走「首次加载」分支，用 `data/*.js` 预设重新初始化
+
+等同于全新安装状态，**不可撤销**。只清除本项目写入的键，不影响其他应用的数据。
 
 ⚠️ 往 `cardPacks.js` 加卡包时，**必须同时在 `public/card_pack/` 放封面图**，文件名为 `<imageKey>.png`，否则卡包列表会出现空白封面。
-⚠️ 新卡包的 `giftIds` 只是首次注入的种子。用户改过后就存在 localStorage 里，之后再改预设不会同步 —— 需在管理界面手动改，或清 `egogift_packGifts` 后重载。
+⚠️ 往 `cardPacks.js` 的 `giftIds` 加饰品时，无需清 localStorage —— 预设中缺失的 giftId 会自动追加进本地映射。但若用户此前**主动移除过**该饰品，会被墓碑拦住不再追加（需在管理界面手动加回，或清 `egogift_removedPackGifts`）。
+⚠️ 往 `recipes.js` 加配方时，**`id` 必须唯一**（建议沿用递增的数字字符串），该 id 是预设配方的身份标识，墓碑也按它记录。
 
 ## 许可
 

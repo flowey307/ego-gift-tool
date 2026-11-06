@@ -186,7 +186,6 @@ const {
   hoverGift,
   panelStyle,
   setHoverGift,
-  scheduleClosePanel,
   startDrag,
   onPanelEnter,
   onPanelLeave,

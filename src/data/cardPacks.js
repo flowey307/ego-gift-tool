@@ -74,7 +74,7 @@ export default [
     name: '宅邸的副产物',
     imageKey: 'Dregs of the Manor',
     floors: [1],
-    giftIds: [9431, 9432, 9249],
+    giftIds: [9431, 9432, 9249, 9872],
   },
   {
     id: 'A Certain World',
@@ -88,28 +88,28 @@ export default [
     name: '心意相悖',
     imageKey: 'The Heartbreaking',
     floors: [5, 6, 7, 8, 9, 10],
-    giftIds: [9435, 9436],
+    giftIds: [9435, 9436, 9872],
   },
   {
     id: 'La Manchaland Re-opening',
     name: '重新开园的拉・曼却领',
     imageKey: 'La Manchaland Re-opening',
     floors: [5, 6, 7, 8, 9, 10],
-    giftIds: [9437, 9438, 9439, 9440, 9795, 9213, 9205],
+    giftIds: [9437, 9438, 9439, 9440, 9795, 9213],
   },
   {
     id: 'The Infinite Procession',
     name: '无尽的游行',
     imageKey: 'The Infinite Procession',
     floors: [5, 6, 7, 8, 9, 10],
-    giftIds: [9437, 9438, 9439, 9440, 9795, 9213, 9205],
+    giftIds: [9437, 9438, 9439, 9440, 9795, 9213],
   },
   {
     id: 'The Dream Ending',
     name: '梦之终焉',
     imageKey: 'The Dream Ending',
     floors: [5, 6, 7, 8, 9, 10],
-    giftIds: [9437, 9438, 9439, 9440, 9795, 9213, 9205],
+    giftIds: [9437, 9438, 9439, 9440, 9795, 9213],
   },
   {
     id: 'Four Houses and Greed',
@@ -422,7 +422,7 @@ export default [
     name: '无法成为血魔的人们',
     imageKey: 'Who Couldnt Be Bloodfiends',
     floors: [11, 12, 13, 14, 15],
-    giftIds: [89048, 9205],
+    giftIds: [],
   },
   {
     id: 'A Beautiful Voice',
@@ -471,7 +471,7 @@ export default [
     name: '充满祝福的嘉年华',
     imageKey: 'Blessed Carnival',
     floors: [11, 12, 13, 14, 15],
-    giftIds: [9851, 9205],
+    giftIds: [9851],
   },
   {
     id: 'Fairy Tale',
@@ -499,7 +499,7 @@ export default [
     name: '拉・曼却领之主',
     imageKey: 'The Master of La Manchaland',
     floors: [11, 12, 13, 14, 15],
-    giftIds: [9827, 9205],
+    giftIds: [9827],
   },
   {
     id: 'Chachihu',

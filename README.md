@@ -21,6 +21,7 @@
 - 饰品描述中的状态效果标签自动渲染为图标 + 中文翻译，悬浮查看详细说明
 - 游客 / 管理员双模式，隐藏编辑入口
 - 全部用户数据（标签、稀有度、自定义饰品等）保存在浏览器本地，无需联网
+- 一键「恢复默认」：清除本地数据并回到初始预设状态
 
 ## 获取使用
 
@@ -43,8 +44,10 @@
 ## 使用说明
 
 - **模式切换**：右上角按钮在「游客」和「管理」之间切换。游客模式隐藏所有增删改入口，适合日常查看；管理模式开放卡包管理、饰品编辑、配方编辑等。
+- **恢复默认**：导航栏最右侧的「恢复默认」按钮会清除全部本地数据并回到初始预设状态（等同全新安装），操作前有二次确认。
 - **楼层规划**：支持 1–15 层，其中 6–10 层为「平行叠加」、11–15 层为「极限模式」。
 - **数据保存在本地**：所有改动存在浏览器的 localStorage 中，**清除浏览器数据会导致全部偏好丢失**。重要配置建议用页面内的增删改功能维护，不要依赖手动清理浏览器。
+- **预设更新自动同步**：官方预设新增的饰品、配方、卡包会在打开页面时自动补进本地，不会覆盖你改过的内容；你主动删除的条目也不会被重新加回来。
 
 ## 本地开发
 
@@ -74,7 +77,7 @@ npm run format           # Prettier 格式化 src/ 目录
 Vue 3.5     ──┐
               ├──  Composition API + <script setup>
 Vite 8.0    ─┤
-Pinia 3.0   ─┼── 状态管理（5 个 Store）
+Pinia 3.0   ─┼── 状态管理（6 个 Store）
 Vue Router 5   ─┤
               │
 ESLint 10 + oxlint + Prettier ── 代码检查与格式化
@@ -103,11 +106,12 @@ Electron 43  ────────────────── 桌面端封
     │   ├── cardPacks.js    # 预设卡包（含 giftIds，即卡包→饰品映射）
     │   └── recipes.js      # 预设配方
     ├── stores/             # Pinia Stores
-    │   ├── gifts.js        # 饰品 CRUD、类别/搜索过滤
+    │   ├── gifts.js        # 饰品 CRUD、类别/搜索过滤、快照合并
     │   ├── cardPack.js     # 卡包 CRUD、楼层分配
     │   ├── recipes.js      # 配方 CRUD
     │   ├── userData.js     # 用户偏好（选中、标签、稀有度等）
-    │   └── mode.js         # 游客 / 管理员模式
+    │   ├── mode.js         # 游客 / 管理员模式
+    │   └── reset.js        # 恢复默认（清 localStorage + 刷新页面）
     ├── views/              # 页面组件
     ├── components/         # 公共组件
     ├── composables/        # 跨组件逻辑复用
@@ -127,12 +131,16 @@ Electron 43  ────────────────── 桌面端封
 
 | 键                              | 用途                               |
 | ------------------------------- | ---------------------------------- |
+| `egogift_giftsSnapshot`         | 饰品全量快照（数据的唯一基准）     |
 | `egogift_giftOverrides`         | 覆盖官方饰品数据（名称/类别/描述） |
 | `egogift_customGifts`           | 用户自定义添加的饰品               |
 | `egogift_deletedGiftIds`        | 已删除的饰品 ID                    |
 | `egogift_recipes`               | 合成配方                           |
+| `egogift_removedRecipeIds`      | 已删除的预设配方（墓碑）           |
 | `egogift_cardPacks`             | 卡包配置                           |
 | `egogift_packGifts`             | 卡包→饰品映射                      |
+| `egogift_removedPackIds`        | 已删除的预设卡包（墓碑）           |
+| `egogift_removedPackGifts`      | 已移除的预设卡包饰品（墓碑）       |
 | `egogift_selectedGiftIds`       | 已选饰品（楼层规划）               |
 | `egogift_giftLabels`            | 饰品标签                           |
 | `egogift_giftRarities`          | 稀有度覆盖                         |
