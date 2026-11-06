@@ -2,6 +2,9 @@
 @font-face {
   font-family: LimbusFont;
   src: url('/fonts/ChineseFont.ttf') format('truetype');
+  /* 字体文件约 23MB，不加 swap 会阻塞首屏渲染（load 事件要等字体下载完）。
+     swap 让页面先用系统字体渲染，字体到位后自动替换 */
+  font-display: swap;
 }
 
 /* 全局重置 */
@@ -117,7 +120,10 @@ body {
   font-size: 13px;
   font-family: LimbusFont, sans-serif;
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    color 0.2s;
 }
 
 .reset-btn:hover:not(:disabled) {

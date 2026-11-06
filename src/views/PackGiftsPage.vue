@@ -28,7 +28,10 @@
             :placeholder="modeStore.isAdmin ? '添加饰品...' : '添加饰品（需管理模式）'"
             @focus="showDropdown = true"
           />
-          <div v-if="modeStore.isAdmin && showDropdown && searchResults.length" class="pack-detail__dropdown">
+          <div
+            v-if="modeStore.isAdmin && showDropdown && searchResults.length"
+            class="pack-detail__dropdown"
+          >
             <div
               v-for="g in searchResults"
               :key="g.id"
