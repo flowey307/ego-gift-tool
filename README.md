@@ -25,9 +25,15 @@
 
 ## 获取使用
 
-两种版本功能完全一致，按需选择。
+三种版本功能完全一致，按需选择。
 
-### 免安装网页版（推荐给想快速用的人）
+### 在线网页版（无需下载）
+
+直接访问 **https://flowey307.github.io/ego-gift-tool/**
+
+由 GitHub Pages 自动部署，每次推送 `main` 分支即自动更新。适合想直接在浏览器里用的人。
+
+### 免安装网页版（离线可用）
 
 前往 [Release](https://github.com/flowey307/ego-gift-tool/releases) 下载网页版压缩包，解压后双击其中的 `.html` 文件即可在浏览器中打开使用。
 
@@ -64,6 +70,30 @@ npm run electron:dev     # 启动桌面应用（Vite + Electron）
 npm run electron:build   # 打包 Windows NSIS 安装包 → release/
 ```
 
+### 单文件网页版构建
+
+`npm run build:single` 会产出 `dist-single/`，内含 `index.html` 与四个资源目录。
+
+```sh
+node build/single.js --skip-dist   # 只产出 dist-single/，跳过重建 dist/
+```
+
+`--skip-dist` 供 CI 使用 —— GitHub Pages 部署不需要 Electron 用的 `dist/`，跳过可省一次构建。
+
+> 字体只拷贝子集版（`ChineseFont-subset.woff2` / `.ttf`），完整的 `ChineseFont.ttf`（22.8 MB）不再打进产物。
+
+### 部署到 GitHub Pages
+
+推送 `main` 分支即自动部署，workflow 位于 `.github/workflows/deploy-pages.yml`。
+
+```sh
+git push origin main
+```
+
+部署使用 hash 路由（`single` 模式自动切换），任意路径直接刷新都不会 404。
+
+> 产物约 93 MB，超过 `deploy-pages` 默认的 10 分钟超时上限，workflow 中已放宽到 30 分钟。
+
 ### 代码质量
 
 ```sh
@@ -85,6 +115,36 @@ vite-plugin-singlefile ──────── 单文件网页版构建
 Electron 43  ────────────────── 桌面端封装
 ```
 
+## 性能优化
+
+针对首屏加载做过几处针对性处理，改动记录在此便于后续维护。
+
+### 字体子集化
+
+原始字体为 Sarasa Gothic SC，22.8 MB。直接用于 Web 会拖垮首屏 —— 单个 23 MB 请求会占满连接的带宽窗口，后续数百个图标请求全部排队。
+
+用 fontTools 做子集化，保留：
+
+- 源码实际用字 1474 个（缺失 0 个）
+- GB2312 一级字库 6762 字全覆盖（用户自定义饰品名不会缺字）
+- 常用中文标点与装饰符号
+
+| 文件                        | 体积   | 用途           |
+| --------------------------- | ------ | -------------- |
+| `ChineseFont.ttf`           | 22.8MB | 完整版，不再引用 |
+| `ChineseFont-subset.ttf`    | 3.5MB  | 兼容回退       |
+| `ChineseFont-subset.woff2`  | 1.5MB  | 首选           |
+
+`@font-face` 同时声明 woff2 与 ttf，并设 `font-display: swap`，字体未就绪时先用系统字体渲染。
+
+### 图片懒加载
+
+原生 `loading="lazy"` 在图鉴页**无效** —— 466 个饰品格子分布在同一条长滚动流里，Chromium 实测仍会立即发出 431 个请求，全挤在同一条 HTTP/2 连接上形成队头阻塞。
+
+改用 `v-lazy-img` 指令（`src/directives/lazyImg.js`），基于 IntersectionObserver 主动接管 `src` 的设置，只加载进入视口（含 300px 预加载边距）的图片。请求数从 431 降至 92。
+
+> 高延迟网络下 HTTP/2 的队头阻塞更明显。实测同一页面强制 HTTP/1.1 时，12 秒内完成 110 个请求、渲染 446/811 图标；HTTP/2 下仅完成 1 个请求。
+
 ## 项目结构
 
 ```
@@ -92,11 +152,12 @@ Electron 43  ────────────────── 桌面端封
 ├── vite.config.js          # 别名 @ → src
 ├── electron-main.cjs       # Electron 主进程（起本地 HTTP 服务加载 dist/）
 ├── build/single.js         # 单文件网页版构建脚本
+├── .github/workflows/      # GitHub Pages 自动部署
 ├── public/                 # 静态资源（以 URL 直接引用，不进 bundle）
 │   ├── EgoGiftIcon/        # 饰品图标
 │   ├── Buf/                # 状态 / 类别图标
 │   ├── card_pack/          # 卡包封面
-│   └── fonts/
+│   └── fonts/              # 中文字体（子集版 + 完整版）
 └── src/
     ├── main.js             # 应用入口
     ├── App.vue             # 导航栏 + 数据加载
@@ -115,6 +176,8 @@ Electron 43  ────────────────── 桌面端封
     ├── views/              # 页面组件
     ├── components/         # 公共组件
     ├── composables/        # 跨组件逻辑复用
+    ├── directives/
+    │   └── lazyImg.js      # 图片懒加载指令（IntersectionObserver）
     ├── utils/
     │   ├── statusHelpers.js  # 状态效果数据表 + translateStatus()
     │   ├── storage.js        # localStorage 读写封装
@@ -151,6 +214,8 @@ Electron 43  ────────────────── 桌面端封
 自定义图片以 Base64 存储：`egogift_icon_${id}`（饰品图标）、`cardpack_img_${id}`（卡包封面）。
 
 > ⚠️ 清除浏览器数据会导致所有用户偏好丢失。
+
+> 线上版（GitHub Pages）与本地版的 localStorage 按「域名 + 协议」隔离，两边的数据**不互通**。桌面版走 `http://127.0.0.1:9876`，与网页版的数据也是分开的。
 
 ## 许可
 

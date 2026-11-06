@@ -26,7 +26,8 @@
     "files": [
       "dist/**/*",
       "electron-main.cjs",
-      "!node_modules/**/*"
+      "!node_modules/**/*",
+      "!dist/fonts/ChineseFont.ttf"
     ],
     "directories": {
       "output": "release"
